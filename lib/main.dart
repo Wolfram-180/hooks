@@ -59,12 +59,30 @@ class HomePage extends HookWidget {
     ); 
 */
 
-    ///* 3
-    NetworkAssetBundle(Uri.parse(url))
-        .load(url)
-        .then((data) => data.buffer.asUint8List())
-        .then((data) => Image.memory(data));
-//*/
+/* 3.1
+    final image = useFuture(
+      NetworkAssetBundle(Uri.parse(url))
+          .load(url)
+          .then((data) => data.buffer.asUint8List())
+          .then(
+            (data) => Image.memory(data),
+          ),
+    );
+*/
+
+// /* 3.2
+    final future = useMemoized(
+      () => NetworkAssetBundle(Uri.parse(url))
+          .load(url)
+          .then((data) => data.buffer.asUint8List())
+          .then(
+            (data) => Image.memory(data),
+          ),
+    );
+
+    final snapshot = useFuture(future);
+// */
+
     return Scaffold(
       appBar: AppBar(
         /* 1
@@ -81,6 +99,12 @@ class HomePage extends HookWidget {
           Text('You typed ${text.value}'),
         ],
 ), */
+
+// /* 3
+      body: Column(
+        children: [snapshot.data].compactMap().toList(),
+      ),
+// */
     );
   }
 }
