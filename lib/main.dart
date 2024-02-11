@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-// 3
+///* 3
 extension CompactMap<T> on Iterable<T?> {
   Iterable<T> compactMap<E>([
     E? Function(T?)? transform,
@@ -14,6 +15,7 @@ extension CompactMap<T> on Iterable<T?> {
           )
           .cast();
 }
+//*/
 
 void main() {
   runApp(
@@ -28,14 +30,18 @@ void main() {
   );
 }
 
+///* 3
+const url = 'http://bit.ly/3wh1u1S';
+//*/
+
 class HomePage extends HookWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    /* 1
+/* 1
     final dateTime = useStream(getTime()); 
-    */
+*/
 
 /* 2
    final controller = useTextEditingController();
@@ -51,8 +57,14 @@ class HomePage extends HookWidget {
       },
       [controller],
     ); 
-    */
+*/
 
+    ///* 3
+    NetworkAssetBundle(Uri.parse(url))
+        .load(url)
+        .then((data) => data.buffer.asUint8List())
+        .then((data) => Image.memory(data));
+//*/
     return Scaffold(
       appBar: AppBar(
         /* 1
@@ -60,14 +72,15 @@ class HomePage extends HookWidget {
          */
         title: Text('Home page'),
       ),
-/*       body: Column(
+/* 2
+  body: Column(
         children: [
           TextField(
             controller: controller,
           ),
           Text('You typed ${text.value}'),
         ],
-      ), */
+), */
     );
   }
 }
