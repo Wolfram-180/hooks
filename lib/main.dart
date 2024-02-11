@@ -1,6 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
+// 3
+extension CompactMap<T> on Iterable<T?> {
+  Iterable<T> compactMap<E>([
+    E? Function(T?)? transform,
+  ]) =>
+      map(
+        transform ?? (e) => e,
+      )
+          .where(
+            (e) => e != null,
+          )
+          .cast();
+}
+
 void main() {
   runApp(
     MaterialApp(
@@ -19,9 +33,12 @@ class HomePage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    //final dateTime = useStream(getTime()); // 1
+    /* 1
+    final dateTime = useStream(getTime()); 
+    */
 
-    final controller = useTextEditingController();
+/* 2
+   final controller = useTextEditingController();
     final text = useState('');
     useEffect(
       () {
@@ -33,21 +50,24 @@ class HomePage extends HookWidget {
         return null;
       },
       [controller],
-    );
+    ); 
+    */
 
     return Scaffold(
       appBar: AppBar(
-        // title: Text(dateTime.data ?? 'Home page'), // 1
+        /* 1
+         title: Text(dateTime.data ?? 'Home page'),
+         */
         title: Text('Home page'),
       ),
-      body: Column(
+/*       body: Column(
         children: [
           TextField(
             controller: controller,
           ),
           Text('You typed ${text.value}'),
         ],
-      ),
+      ), */
     );
   }
 }
