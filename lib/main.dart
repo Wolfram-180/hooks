@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-///* 3
+/* 3
 extension CompactMap<T> on Iterable<T?> {
   Iterable<T> compactMap<E>([
     E? Function(T?)? transform,
@@ -15,7 +17,7 @@ extension CompactMap<T> on Iterable<T?> {
           )
           .cast();
 }
-//*/
+*/
 
 void main() {
   runApp(
@@ -30,9 +32,9 @@ void main() {
   );
 }
 
-///* 3
+/* 3
 const url = 'http://bit.ly/3wh1u1S';
-//*/
+*/
 
 class HomePage extends HookWidget {
   const HomePage({super.key});
@@ -70,25 +72,32 @@ class HomePage extends HookWidget {
     );
 */
 
-// /* 3.2
+    /* 3.2
     final future = useMemoized(
       () => NetworkAssetBundle(Uri.parse(url))
           .load(url)
           .then((data) => data.buffer.asUint8List())
           .then(
-            (data) => Image.memory(data),
+            (data) => FittedBox(
+              fit: BoxFit.fitHeight,
+              child: Image.memory(data),
+            ),
           ),
     );
 
     final snapshot = useFuture(future);
-// */
+*/
 
+// /* 4
+    final countDown = useMemoized(() => CountDown(from: 20));
+    final notifier = useListenable(countDown);
+// */
     return Scaffold(
       appBar: AppBar(
         /* 1
          title: Text(dateTime.data ?? 'Home page'),
          */
-        title: Text('Home page'),
+        title: const Text('Home page'),
       ),
 /* 2
   body: Column(
@@ -100,11 +109,22 @@ class HomePage extends HookWidget {
         ],
 ), */
 
-// /* 3
+      /* 3
       body: Column(
         children: [snapshot.data].compactMap().toList(),
       ),
-// */
+ */
+
+// /* 4
+      body: Center(
+        child: Column(
+          children: [
+            Text(
+              notifier.value.toString(),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -112,4 +132,25 @@ class HomePage extends HookWidget {
 /* 1
  Stream<String> getTime() => Stream.periodic(
      const Duration(seconds: 1), (_) => DateTime.now().toIso8601String());
-*/     
+*/
+
+// /* 4
+class CountDown extends ValueNotifier<int> {
+  late StreamSubscription sub;
+  CountDown({required int from}) : super(from) {
+    sub = Stream.periodic(const Duration(seconds: 1), (v) => from - v)
+        .takeWhile((value) => value >= 0)
+        .listen(
+      (value) {
+        this.value = value;
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    sub.cancel();
+    super.dispose();
+  }
+}
+// */
