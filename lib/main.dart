@@ -34,7 +34,7 @@ void main() {
 const url = 'http://bit.ly/3wh1u1S';
 */
 
-// /* 5
+/* 5
 const url = 'http://bit.ly/3wh1u1S';
 const imageHeight = 300.0;
 
@@ -49,6 +49,10 @@ extension Normalize on num {
           ((this - selfRangeMin) / (selfRangeMax - selfRangeMin)) +
       normalizedRangeMin;
 }
+*/
+
+// /* 6
+const url = 'http://bit.ly/3wh1u1S';
 // */
 
 class HomePage extends HookWidget {
@@ -104,7 +108,7 @@ class HomePage extends HookWidget {
     final notifier = useListenable(countDown);
 */
 
-// /* 5
+/* 5
     final opacity = useAnimationController(
       duration: const Duration(seconds: 1),
       initialValue: 1.0,
@@ -133,7 +137,19 @@ class HomePage extends HookWidget {
       },
       [controller],
     );
+*/
+
+// /* 6
+
+    late final StreamController<double> controller;
+    controller = useStreamController<double>(
+      onListen: () {
+        controller.sink.add(0.0);
+      },
+    );
+
 // */
+
     return Scaffold(
       appBar: AppBar(
 /* 1
@@ -167,7 +183,7 @@ class HomePage extends HookWidget {
         ),
       ),
 */
-// /* 5
+/* 5
       body: Column(
         children: [
           SizeTransition(
@@ -196,6 +212,29 @@ class HomePage extends HookWidget {
                 }),
           ),
         ],
+      ),
+*/
+// /* 6
+      body: StreamBuilder<double>(
+        stream: controller.stream,
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const CircularProgressIndicator();
+          } else {
+            final rotation = snapshot.data ?? 0.0;
+            return GestureDetector(
+              onTap: () {
+                controller.sink.add(rotation + 10.0);
+              },
+              child: RotationTransition(
+                turns: AlwaysStoppedAnimation(rotation / 360.0),
+                child: Center(
+                  child: Image.network(url),
+                ),
+              ),
+            );
+          }
+        },
       ),
 // */
     );
