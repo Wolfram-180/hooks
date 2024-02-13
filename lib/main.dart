@@ -1,7 +1,6 @@
 import 'dart:async';
-
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 /* 3
@@ -22,7 +21,6 @@ extension CompactMap<T> on Iterable<T?> {
 void main() {
   runApp(
     MaterialApp(
-      title: 'Test app',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -36,6 +34,23 @@ void main() {
 const url = 'http://bit.ly/3wh1u1S';
 */
 
+// /* 5
+const url = 'http://bit.ly/3wh1u1S';
+const imageHeight = 300.0;
+
+extension Normalize on num {
+  num normalized(
+    num selfRangeMin,
+    num selfRangeMax, [
+    num normalizedRangeMin = 0.0,
+    num normalizedRangeMax = 1.0,
+  ]) =>
+      (normalizedRangeMax - normalizedRangeMin) *
+          ((this - selfRangeMin) / (selfRangeMax - selfRangeMin)) +
+      normalizedRangeMin;
+}
+// */
+
 class HomePage extends HookWidget {
   const HomePage({super.key});
 
@@ -44,7 +59,6 @@ class HomePage extends HookWidget {
 /* 1
     final dateTime = useStream(getTime()); 
 */
-
 /* 2
    final controller = useTextEditingController();
     final text = useState('');
@@ -60,7 +74,6 @@ class HomePage extends HookWidget {
       [controller],
     ); 
 */
-
 /* 3.1
     final image = useFuture(
       NetworkAssetBundle(Uri.parse(url))
@@ -71,8 +84,7 @@ class HomePage extends HookWidget {
           ),
     );
 */
-
-    /* 3.2
+/* 3.2
     final future = useMemoized(
       () => NetworkAssetBundle(Uri.parse(url))
           .load(url)
@@ -87,16 +99,46 @@ class HomePage extends HookWidget {
 
     final snapshot = useFuture(future);
 */
-
-// /* 4
+/* 4
     final countDown = useMemoized(() => CountDown(from: 20));
     final notifier = useListenable(countDown);
+*/
+
+// /* 5
+    final opacity = useAnimationController(
+      duration: const Duration(seconds: 1),
+      initialValue: 1.0,
+      lowerBound: 0.0,
+      upperBound: 1.0,
+    );
+
+    final size = useAnimationController(
+      duration: const Duration(seconds: 1),
+      initialValue: 1.0,
+      lowerBound: 0.0,
+      upperBound: 1.0,
+    );
+
+    final controller = useScrollController();
+
+    useEffect(
+      () {
+        controller.addListener(() {
+          final newOpacity = max(imageHeight - controller.offset, 0.0);
+          final normalized = newOpacity.normalized(0.0, imageHeight).toDouble();
+          opacity.value = normalized;
+          size.value = normalized;
+        });
+        return null;
+      },
+      [controller],
+    );
 // */
     return Scaffold(
       appBar: AppBar(
-        /* 1
+/* 1
          title: Text(dateTime.data ?? 'Home page'),
-         */
+*/
         title: const Text('Home page'),
       ),
 /* 2
@@ -107,15 +149,14 @@ class HomePage extends HookWidget {
           ),
           Text('You typed ${text.value}'),
         ],
-), */
-
-      /* 3
+), 
+*/
+/* 3
       body: Column(
         children: [snapshot.data].compactMap().toList(),
       ),
- */
-
-// /* 4
+*/
+/* 4
       body: Center(
         child: Column(
           children: [
@@ -125,6 +166,38 @@ class HomePage extends HookWidget {
           ],
         ),
       ),
+*/
+// /* 5
+      body: Column(
+        children: [
+          SizeTransition(
+            sizeFactor: size,
+            axis: Axis.vertical,
+            axisAlignment: -1.0,
+            child: FadeTransition(
+              opacity: opacity,
+              child: Image.network(
+                url,
+                height: imageHeight,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+                controller: controller,
+                itemCount: 100,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(
+                      'Person ${index + 1}',
+                    ),
+                  );
+                }),
+          ),
+        ],
+      ),
+// */
     );
   }
 }
@@ -134,7 +207,7 @@ class HomePage extends HookWidget {
      const Duration(seconds: 1), (_) => DateTime.now().toIso8601String());
 */
 
-// /* 4
+/* 4
 class CountDown extends ValueNotifier<int> {
   late StreamSubscription sub;
   CountDown({required int from}) : super(from) {
@@ -153,4 +226,4 @@ class CountDown extends ValueNotifier<int> {
     super.dispose();
   }
 }
-// */
+*/
