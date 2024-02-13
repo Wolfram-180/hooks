@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -216,7 +215,10 @@ class HomePage extends HookWidget {
 // /* 7
     final store = useReducer<State, Action?>(reducer,
         initialState: const State.zero(), initialAction: null);
+// */
 
+// /* 8
+    final state = useAppLifecycleState();
 // */
 
     return Scaffold(
@@ -321,12 +323,25 @@ class HomePage extends HookWidget {
           ),
           const SizedBox(height: 100),
           Opacity(
+            /* 7
             opacity: store.state.alpha,
+            */
+            // /* 8
+            opacity:
+                state == AppLifecycleState.resumed ? store.state.alpha : 0.0,
+            // */
             child: RotationTransition(
               turns: AlwaysStoppedAnimation(
                 store.state.rotationDeg / 360.0,
               ),
-              child: SizedBox(
+              child: Container(
+                decoration: BoxDecoration(boxShadow: [
+                  BoxShadow(
+                    blurRadius: 10,
+                    color: Colors.black.withAlpha(100),
+                    spreadRadius: 10,
+                  )
+                ]),
                 height: 200,
                 child: Image.network(url),
               ),
@@ -415,7 +430,7 @@ class RotateLeftButton extends StatelessWidget {
     );
   }
 }
-// */
+// 7 */
 
 /* 1
  Stream<String> getTime() => Stream.periodic(
